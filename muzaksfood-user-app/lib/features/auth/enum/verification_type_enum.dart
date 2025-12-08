@@ -1,1 +1,0 @@
-enum VerificationType {email, phone}

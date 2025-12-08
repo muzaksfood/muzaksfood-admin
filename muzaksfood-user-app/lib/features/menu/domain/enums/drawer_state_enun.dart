@@ -1,1 +1,0 @@
-enum DrawerState { opening, closing, open, closed }

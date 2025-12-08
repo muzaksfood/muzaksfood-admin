@@ -1,4 +1,0 @@
-enum FooterType {
-  sliver,
-  nonSliver,
-}
