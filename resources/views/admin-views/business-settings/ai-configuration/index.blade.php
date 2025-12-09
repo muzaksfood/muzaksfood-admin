@@ -36,7 +36,13 @@
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-start gap-3">
                                             <div>
-                                                <h6 class="mb-1">{{ translate($providerName) }}</h6>
+                                                <div class="d-flex gap-2 align-items-center">
+                                                    <h6 class="mb-0">{{ translate($providerName) }}</h6>
+                                                    <i class="tio-info-outined cursor-pointer" 
+                                                       data-toggle="modal" 
+                                                       data-target="#aiProviderGuidelineModal{{ $loop->index }}"
+                                                       style="cursor: pointer; opacity: 0.6;"></i>
+                                                </div>
                                                 <p class="mb-2 fs-12 text-muted">{{ translate('Provide_API_key_and_optional_base_URL_or_model_for_this_provider.') }}</p>
                                             </div>
                                             <label class="toggle-switch my-0">
@@ -262,4 +268,82 @@
             });
         })
     </script>
+
+    {{-- Provider guideline modals --}}
+    @foreach($providers as $providerName)
+        @php($index = $loop->index)
+        <div class="modal fade p-0" id="aiProviderGuidelineModal{{ $index }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-slideInRight modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header d-flex gap-2 justify-content-between">
+                        <h5 class="modal-title">{{ translate($providerName . '_Setup') }}</h5>
+                        <button type="button" class="btn btn-circle bg-body-light text-white h-1" style="--size: 20px;" data-dismiss="modal">
+                            <i class="tio-clear"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @if($providerName === 'OpenAI')
+                            <div class="alert alert-info fs-12 mb-3">
+                                <strong>{{ translate('OpenAI') }}</strong>
+                                <ul class="mb-0 mt-2 ps-3">
+                                    <li>{{ translate('Visit') }} <a href="https://platform.openai.com" target="_blank">platform.openai.com</a></li>
+                                    <li>{{ translate('Create_API_key_from_dashboard') }}</li>
+                                    <li>{{ translate('Model_default') }}: gpt-4o</li>
+                                    <li>{{ translate('Supports_image_analysis') }}</li>
+                                    <li>{{ translate('Pricing') }}: {{ translate('Pay_as_you_go') }}</li>
+                                </ul>
+                            </div>
+                        @elseif($providerName === 'DeepSeek')
+                            <div class="alert alert-info fs-12 mb-3">
+                                <strong>{{ translate('DeepSeek') }}</strong>
+                                <ul class="mb-0 mt-2 ps-3">
+                                    <li>{{ translate('Direct_API') }}: <a href="https://platform.deepseek.com" target="_blank">platform.deepseek.com</a></li>
+                                    <li>{{ translate('Free_tier') }}: Use <a href="https://openrouter.ai" target="_blank">OpenRouter.ai</a></li>
+                                    <li>{{ translate('If_using_OpenRouter') }}:
+                                        <br><code class="fs-12">{{ translate('Base_URL') }}: https://openrouter.ai/api/v1</code>
+                                        <br><code class="fs-12">{{ translate('Model') }}: deepseek/deepseek-chat</code>
+                                    </li>
+                                    <li>{{ translate('Rate_limit') }}: {{ translate('May_be_limited_on_free_tier') }}</li>
+                                </ul>
+                            </div>
+                        @elseif($providerName === 'Gemini')
+                            <div class="alert alert-info fs-12 mb-3">
+                                <strong>{{ translate('Gemini') }}</strong>
+                                <ul class="mb-0 mt-2 ps-3">
+                                    <li>{{ translate('Visit') }} <a href="https://ai.google.dev" target="_blank">ai.google.dev</a></li>
+                                    <li>{{ translate('Create_API_key_at') }} <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a></li>
+                                    <li>{{ translate('Model_default') }}: gemini-1.5-flash-latest</li>
+                                    <li>{{ translate('Free_tier') }}: 15 requests/min</li>
+                                    <li>{{ translate('No_credit_card_required') }}</li>
+                                </ul>
+                            </div>
+                        @elseif($providerName === 'Grok')
+                            <div class="alert alert-info fs-12 mb-3">
+                                <strong>{{ translate('Grok') }}</strong>
+                                <ul class="mb-0 mt-2 ps-3">
+                                    <li>{{ translate('Visit') }} <a href="https://console.x.ai" target="_blank">console.x.ai</a></li>
+                                    <li>{{ translate('Request_API_access') }}</li>
+                                    <li>{{ translate('Model_default') }}: grok-beta</li>
+                                    <li>{{ translate('Base_URL') }}: https://api.x.ai/v1</li>
+                                    <li>{{ translate('Experimental_API') }}</li>
+                                </ul>
+                            </div>
+                        @elseif($providerName === 'Claude')
+                            <div class="alert alert-info fs-12 mb-3">
+                                <strong>{{ translate('Claude') }}</strong>
+                                <ul class="mb-0 mt-2 ps-3">
+                                    <li>{{ translate('Visit') }} <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></li>
+                                    <li>{{ translate('Create_API_key_in_account_settings') }}</li>
+                                    <li>{{ translate('Model_default') }}: claude-3-haiku-20240307</li>
+                                    <li>{{ translate('Supports_image_analysis') }}</li>
+                                    <li>{{ translate('Pay_per_token') }}</li>
+                                </ul>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
 @endpush
+

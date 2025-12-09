@@ -49,6 +49,13 @@ class DeepSeekProvider implements AIProviderInterface
 
         $message = $imageUrl ? $prompt . "\n\nImage reference: " . $imageUrl : $prompt;
 
+        // Support OpenRouter.ai endpoint
+        $isOpenRouter = strpos($this->baseUrl, 'openrouter.ai') !== false;
+        
+        if ($isOpenRouter) {
+            return $this->generateViaOpenRouter($message);
+        }
+
         $response = Http::withToken($this->apiKey)
             ->acceptJson()
             ->post($this->baseUrl . '/chat/completions', [
@@ -74,4 +81,35 @@ class DeepSeekProvider implements AIProviderInterface
 
         return $content;
     }
+
+    protected function generateViaOpenRouter(string $message): string
+    {
+        $response = Http::withHeader('Authorization', 'Bearer ' . $this->apiKey)
+            ->withHeader('HTTP-Referer', config('app.url'))
+            ->withHeader('X-Title', 'MuzaksFood')
+            ->acceptJson()
+            ->post($this->baseUrl . '/chat/completions', [
+                'model' => $this->model,
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => $message,
+                    ],
+                ],
+                'temperature' => 0.3,
+            ]);
+
+        if (!$response->successful()) {
+            throw new \RuntimeException('DeepSeek error: ' . $response->body());
+        }
+
+        $data = $response->json();
+        $content = $data['choices'][0]['message']['content'] ?? null;
+        if (!$content) {
+            throw new \RuntimeException('DeepSeek returned empty response');
+        }
+
+        return $content;
+    }
 }
+
