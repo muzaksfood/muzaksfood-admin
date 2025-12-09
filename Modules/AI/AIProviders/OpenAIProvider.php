@@ -9,6 +9,9 @@ class OpenAIProvider implements AIProviderInterface
 {
     protected string $apiKey;
     protected ?string $organization;
+    protected string $baseUrl = '';
+    protected string $model = 'gpt-4o';
+    protected array $settings = [];
 
     public function getName(): string
     {
@@ -25,9 +28,39 @@ class OpenAIProvider implements AIProviderInterface
         $this->organization = $organization;
     }
 
+    public function setBaseUrl($baseUrl): void
+    {
+        if ($baseUrl) {
+            $this->baseUrl = rtrim($baseUrl, '/');
+        }
+    }
+
+    public function setModel($model): void
+    {
+        if ($model) {
+            $this->model = $model;
+        }
+    }
+
+    public function setSettings($settings): void
+    {
+        $this->settings = $settings ?? [];
+    }
+
     public function generate(string $prompt, ?string $imageUrl = null, array $options = []): string
     {
-        $client = OpenAI::client($this->apiKey, $this->organization);
+        $factory = OpenAI::factory()
+            ->withApiKey($this->apiKey);
+
+        if ($this->organization) {
+            $factory = $factory->withOrganization($this->organization);
+        }
+
+        if ($this->baseUrl) {
+            $factory = $factory->withBaseUri($this->baseUrl);
+        }
+
+        $client = $factory->make();
         $content = [['type' => 'text', 'text' => $prompt]];
         if (!empty($imageUrl)) {
             $content[] = [
@@ -36,7 +69,7 @@ class OpenAIProvider implements AIProviderInterface
             ];
         }
         $response = $client->chat()->create([
-            'model' => 'gpt-4o',
+            'model' => $this->model,
             'messages' => [
                 [
                     'role' => 'user',

@@ -9,11 +9,13 @@ trait AIModuleManager
 {
     public function getActiveAIProviderConfig()
     {
-        return Cache::remember('active_ai_provider', 60, function () {
+        return Cache::remember('active_ai_providers', 60, function () {
             return AISetting::where('status', 1)
                 ->whereNotNull('api_key')
                 ->where('api_key', '!=', '')
-                ->first();
+                ->orderBy('priority')
+                ->orderBy('id')
+                ->get();
         });
     }
 }

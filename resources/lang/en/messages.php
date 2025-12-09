@@ -3182,4 +3182,5 @@
   'Maximum distance from branch for express delivery availability' => 'Maximum distance from branch for express delivery availability',
   'Radius' => 'Radius',
   'Delivery time commitment in minutes (e.g., 10 for 10-minute delivery)' => 'Delivery time commitment in minutes (e.g.  10 for 10-minute delivery)',
+  'Priority_(1=first)' => 'Priority (1=first)',
 );

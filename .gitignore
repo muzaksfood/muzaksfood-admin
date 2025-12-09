@@ -1,5 +1,8 @@
+# Dependencies
 /vendor/
 /node_modules/
+
+# Laravel specific
 /public/hot
 /public/storage
 /storage/*.key
@@ -9,22 +12,36 @@
 /public/build
 bootstrap/compiled.php
 app/storage/
+
+# Public directories
 public_html/storage
 public_html/hot
+
+# Environment files
 .env
 .env.backup
 .env.production
-.phpunit.result.cache
+
+# IDE & Editor
+/.idea
+/.vscode
+.zencoder
 .phpactor.json
+
+# Testing
+.phpunit.result.cache
+
+# Authentication
 auth.json
+
+# Vagrant
 Homestead.yaml
 Homestead.json
 /.vagrant
+
+# Logs
 npm-debug.log
 yarn-error.log
+
+# OS files
 .DS_Store
-/Modules/Gateways
-/.idea
-/.vscode
-muzaksfood-user-app/
-muzaksfood-delivery-app/

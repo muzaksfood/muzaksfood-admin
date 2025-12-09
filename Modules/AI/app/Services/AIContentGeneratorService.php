@@ -6,6 +6,9 @@ use App\CentralLogics\Helpers;
 use App\Traits\FileManagerTrait;
 use Modules\AI\AIProviders\AIProviderManager;
 use Modules\AI\AIProviders\ClaudeProvider;
+use Modules\AI\AIProviders\DeepSeekProvider;
+use Modules\AI\AIProviders\GeminiProvider;
+use Modules\AI\AIProviders\GrokProvider;
 use Modules\AI\AIProviders\OpenAIProvider;
 use Modules\AI\app\Exceptions\AIProviderException;
 use Modules\AI\app\Exceptions\ImageValidationException;
@@ -23,7 +26,13 @@ class AIContentGeneratorService
     public function __construct()
     {
         $this->loadTemplates();
-        $this->providers = [new OpenAIProvider(), new ClaudeProvider()];
+        $this->providers = [
+            new OpenAIProvider(),
+            new DeepSeekProvider(),
+            new GeminiProvider(),
+            new GrokProvider(),
+            new ClaudeProvider(),
+        ];
     }
 
     protected function loadTemplates(): void

@@ -47,6 +47,12 @@ class AISetting extends Model
         'image_upload_limit',
         'settings',
         'status',
+        'priority',
+        'model',
+    ];
+
+    protected $casts = [
+        'settings' => 'array',
     ];
 
     /**

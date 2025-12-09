@@ -22,30 +22,44 @@ class AIProviderManager
         $this->providers = $providers;
     }
 
+    protected function getProviderMap(): array
+    {
+        $map = [];
+        foreach ($this->providers as $provider) {
+            $map[$provider->getName()] = $provider;
+        }
+        return $map;
+    }
+
     /**
      * @throws AIProviderException
      */
-    public function getAvailableProviderObject()
+    public function getActiveAIProviders()
     {
-        $activeAiProvider = $this->getActiveAIProvider();
-        foreach ($this->providers as $provider) {
-            if ($activeAiProvider->ai_name === $provider->getName()) {
-                $provider->setApiKey($activeAiProvider->api_key);
-                $provider->setOrganization($activeAiProvider->organization_id);
-                return $provider;
-            }
-        }
-
-        throw new AIProviderException('No matching AI provider found.');
-    }
-
-    public function getActiveAIProvider(): AISetting
-    {
-        $provider = $this->getActiveAIProviderConfig();
-        if (!$provider) {
+        $providers = $this->getActiveAIProviderConfig();
+        if (!$providers || $providers->isEmpty()) {
             throw new AIProviderException('No active AI provider available at this moment.');
         }
-        return $provider;
+        return $providers;
+    }
+
+    protected function configureProvider($provider, AISetting $config): void
+    {
+        if (method_exists($provider, 'setApiKey')) {
+            $provider->setApiKey($config->api_key);
+        }
+        if (method_exists($provider, 'setOrganization')) {
+            $provider->setOrganization($config->organization_id);
+        }
+        if (method_exists($provider, 'setBaseUrl') && $config->base_url) {
+            $provider->setBaseUrl($config->base_url);
+        }
+        if (method_exists($provider, 'setModel') && $config->model) {
+            $provider->setModel($config->model);
+        }
+        if (method_exists($provider, 'setSettings') && $config->settings) {
+            $provider->setSettings($config->settings ?? []);
+        }
     }
 
     /**
@@ -56,10 +70,12 @@ class AIProviderManager
      */
     public function generate(string $prompt, ?string $imageUrl = null, array $options = []): string
     {
-        $providerObject = $this->getAvailableProviderObject();
+        $activeProviders = $this->getActiveAIProviders();
+        $providerMap = $this->getProviderMap();
         $aiValidator = new AIResponseValidatorService();
         $appMode = env('APP_MODE');
         $section = $options['section'] ?? '';
+        $errors = [];
 
         if ($appMode === 'demo') {
             $ip = request()->header('x-forwarded-for');
@@ -70,24 +86,42 @@ class AIProviderManager
             }
             Cache::forever($cacheKey, $count + 1);
         }
-        $response = $providerObject->generate($prompt, $imageUrl);
 
-        $validatorMap = [
-            'product_name' => 'validateProductTitle',
-            'product_description' => 'validateProductDescription',
-            'generate_product_title_suggestion' => 'validateProductKeyword',
-            'pricing_and_others' => 'validateProductPricingAndOthers',
-            'generate_title_from_image' => 'validateImageResponse',
-            'category_setup' => 'validateProductCategorySetup',
-            'variation_tag_setup' => 'validateProductVariationTagSetup'
+        foreach ($activeProviders as $config) {
+            if (!isset($providerMap[$config->ai_name])) {
+                $errors[] = $config->ai_name . ': provider not registered';
+                continue;
+            }
 
-        ];
+            $provider = $providerMap[$config->ai_name];
+            $this->configureProvider($provider, $config);
 
-        if ($section && isset($validatorMap[$section])) {
-            $aiValidator->{$validatorMap[$section]}($response, $options['context'] ?? null);
+            try {
+                $response = $provider->generate($prompt, $imageUrl, $options);
+
+                $validatorMap = [
+                    'product_name' => 'validateProductTitle',
+                    'product_description' => 'validateProductDescription',
+                    'generate_product_title_suggestion' => 'validateProductKeyword',
+                    'pricing_and_others' => 'validateProductPricingAndOthers',
+                    'generate_title_from_image' => 'validateImageResponse',
+                    'category_setup' => 'validateProductCategorySetup',
+                    'variation_tag_setup' => 'validateProductVariationTagSetup'
+
+                ];
+
+                if ($section && isset($validatorMap[$section])) {
+                    $aiValidator->{$validatorMap[$section]}($response, $options['context'] ?? null);
+                }
+
+                return $response;
+            } catch (\Throwable $e) {
+                $errors[] = $config->ai_name . ': ' . $e->getMessage();
+                continue;
+            }
         }
 
-        return $response;
+        throw new AIProviderException('All AI providers failed: ' . implode(' | ', $errors));
     }
 
 }

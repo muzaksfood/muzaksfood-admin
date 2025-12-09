@@ -20,52 +20,67 @@
         <form action="{{ route('admin.business-settings.ai-configuration.store') }}" method="POST">
             @csrf
             <div class="card card-body">
-                <div class="d-flex flex-wrap justify-content-between align-items-center">
-                    <div class="mb-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                    <div>
                         <h5 class="card-title mb-1">{{ translate('AI_Configuration') }}</h5>
-                        <p class="fs-12 mb-0">{{ translate('Fill_up_the_necessary_info_to_activate_AI_feature.') }}</p>
-                    </div>
-                    <div class="">
-                        <label class="toggle-switch my-0">
-                            <input type="checkbox"
-                                   class="toggle-switch-input ai-configuration-status-change-alert"
-                                   id="stocksCheckbox2"
-                                   data-status-on-image="{{ asset('public/assets/admin/img/icons/status-on.png') }}"
-                                   data-status-off-image="{{ asset('public/assets/admin/img/icons/status-off.png') }}"
-                                   data-status-on-title="{{ translate('Do you want to activate AI feature') }}?"
-                                   data-status-off-title="{{ translate('Do you want to deactivate AI feature') }}?"
-                                   data-status-on-subtitle="{{ translate('If enabled, AI feature will be active and able to to generate content by AI') }}"
-                                   data-status-off-subtitle="{{ translate('If disabled, AI feature will be inactive and could not able to generate content by AI.') }}"
-                                   data-cancel-btn-text="{{ translate('cancel') }}"
-                                   data-confirm-btn-text="{{ translate('Yes') }}"
-                                   name="status"
-                                @checked($aiSetting?->status ?? 0)
-                            >
-                            <span class="toggle-switch-label mx-auto text"><span class="toggle-switch-indicator"></span></span>
-                        </label>
+                        <p class="fs-12 mb-0">{{ translate('Enable_multiple_AI_providers_and_set_fallback_priority._If_one_provider_is_unavailable,_the_next_active_provider_will_be_used.') }}</p>
                     </div>
                 </div>
-                <div class="bg-light rounded-10 p-4">
-                    <div class="row g-3">
-                        <div class="col-lg-6">
-                            <div class="form-group mb-0">
-                                <label class="text-capitalize">{{ translate('Open_AI_Key') }}
-                                    <i class="tio-info-outined" data-toggle="tooltip" data-placement="top" title="{{ translate('Sign in to OpenAI, create an API key, and use it here.') }}"></i>
-                                </label>
-                                <input type="text" class="form-control" name="api_key" placeholder="{{translate('Type API Key')}} *"  value="{{env('APP_MODE')=='demo'?'':$aiSetting?->api_key}}">
+
+                <div class="bg-light rounded-10 p-3 p-md-4">
+                    <div class="row g-4">
+                        @foreach($providers as $providerName)
+                            @php($setting = $aiSettings[$providerName] ?? null)
+                            <div class="col-12">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start gap-3">
+                                            <div>
+                                                <h6 class="mb-1">{{ translate($providerName) }}</h6>
+                                                <p class="mb-2 fs-12 text-muted">{{ translate('Provide_API_key_and_optional_base_URL_or_model_for_this_provider.') }}</p>
+                                            </div>
+                                            <label class="toggle-switch my-0">
+                                                <input type="checkbox" class="toggle-switch-input" name="providers[{{ $providerName }}][status]" @checked($setting?->status)>
+                                                <span class="toggle-switch-label mx-auto text"><span class="toggle-switch-indicator"></span></span>
+                                            </label>
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="text-capitalize">{{ translate('API_Key') }}</label>
+                                                <input type="text" class="form-control" name="providers[{{ $providerName }}][api_key]" placeholder="{{ translate('Type_API_Key') }}" value="{{ env('APP_MODE')=='demo' ? '' : $setting?->api_key }}">
+                                            </div>
+
+                                            @if($providerName === 'OpenAI')
+                                                <div class="col-md-6">
+                                                    <label class="text-capitalize">{{ translate('Organization_ID') }}</label>
+                                                    <input type="text" class="form-control" name="providers[{{ $providerName }}][organization_id]" placeholder="{{ translate('Type_Organization_Id') }}" value="{{ env('APP_MODE')=='demo' ? '' : $setting?->organization_id }}">
+                                                </div>
+                                            @endif
+
+                                            <div class="col-md-6">
+                                                <label class="text-capitalize">{{ translate('Base_URL_(optional)') }}</label>
+                                                <input type="text" class="form-control" name="providers[{{ $providerName }}][base_url]" placeholder="https://..." value="{{ $setting?->base_url }}">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="text-capitalize">{{ translate('Model_(optional)') }}</label>
+                                                <input type="text" class="form-control" name="providers[{{ $providerName }}][model]" placeholder="{{ translate('auto') }}" value="{{ $setting?->model }}">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="text-capitalize">{{ translate('Priority_(1=first)') }}</label>
+                                                <input type="number" min="1" class="form-control" name="providers[{{ $providerName }}][priority]" value="{{ $setting?->priority ?? $loop->iteration }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group mb-0">
-                                <label class="text-capitalize">{{translate('Open_AI_Organization')}}
-                                    <i class="tio-info-outined" data-toggle="tooltip" data-placement="top" title="{{ translate('Get your OpenAI Organization ID and enter it here for access and billing.') }}"></i>
-                                </label>
-                                <input type="text" class="form-control" name="organization_id" placeholder="{{translate('Type Organization Id')}} *"  value="{{env('APP_MODE')=='demo'?'':$aiSetting?->organization_id}}">
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
+
             <div class="btn--container justify-content-end mt-4">
                 <button type="reset" class="btn btn--reset">{{ translate('Reset') }}</button>
                 <button type="{{env('APP_MODE')!='demo'?'submit':'button'}}" class="btn btn--primary call-demo">{{ translate('Submit') }}</button>
