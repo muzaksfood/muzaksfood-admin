@@ -45,3 +45,10 @@ yarn-error.log
 
 # OS files
 .DS_Store
+
+# Deploy scripts
+/deploy/
+
+# Nested app repositories (managed separately)
+muzaksfood-user-app/
+muzaksfood-delivery-app/
