@@ -717,11 +717,11 @@ class ProductController extends Controller
             return $check;
         }
         $request->validate([
-            'products_file' => 'required|mimes:xlxs|max:' . $this->maxImageSizeKB
+            'products_file' => 'required|mimes:xlsx|max:' . $this->maxImageSizeKB
         ],
             [
                 'products_file.required' => 'The Product file field is empty',
-                'products_file.mimes' => 'File type must be xlxs',
+                'products_file.mimes' => 'File type must be xlsx',
                 'products_file.max' => 'File size must be less than ' . $this->maxImageSizeReadable
             ]
         );
