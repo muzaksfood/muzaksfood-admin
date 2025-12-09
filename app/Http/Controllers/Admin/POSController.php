@@ -1005,9 +1005,8 @@ class POSController extends Controller
 
         if ($request->has('latitude') && $request->has('longitude')) {
             $data = $this->getDistance($originLat, $originLng, $destinationLat, $destinationLng);
-
-            $distance_value = $data[0]['distanceMeters'];
-            $distance = $distance_value / 1000;
+            $distanceValue = is_array($data) && isset($data[0]['distanceMeters']) ? $data[0]['distanceMeters'] : null;
+            $distance = $distanceValue ? $distanceValue / 1000 : 0;
         }
 
         if ($request['selected_area_id']) {
