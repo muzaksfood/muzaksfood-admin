@@ -9,7 +9,7 @@ class GeminiProvider implements AIProviderInterface
 {
     protected string $apiKey = '';
     protected string $baseUrl = 'https://generativelanguage.googleapis.com/v1beta';
-    protected string $model = 'gemini-1.5-flash-latest';
+    protected string $model = 'gemini-1.5-flash';
     protected array $settings = [];
 
     public function getName(): string
