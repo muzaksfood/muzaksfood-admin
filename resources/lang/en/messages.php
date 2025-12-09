@@ -3193,4 +3193,5 @@
   'DeepSeek_Official' => 'DeepSeek Official',
   'OpenRouter_AI' => 'OpenRouter AI',
   'Free' => 'Free',
+  'Pay_per_token' => 'Pay per token',
 );

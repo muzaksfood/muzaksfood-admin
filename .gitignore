@@ -2,6 +2,17 @@
 /vendor/
 /node_modules/
 
+# Laravel cache and storage
+/storage/*
+!/storage/app
+!/storage/app/.gitignore
+!/storage/framework
+!/storage/framework/.gitignore
+!/storage/.gitignore
+
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
+
 # Laravel specific
 /public/hot
 /public/storage
@@ -46,9 +57,9 @@ yarn-error.log
 # OS files
 .DS_Store
 
-# Deploy scripts
-/deploy/
+# Ignore dynamic translation files
+/resources/lang/**/*.php
+!/resources/lang
 
-# Nested app repositories (managed separately)
-muzaksfood-user-app/
-muzaksfood-delivery-app/
+# Deploy scripts
+# /deploy/
