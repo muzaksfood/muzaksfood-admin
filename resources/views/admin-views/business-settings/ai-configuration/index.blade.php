@@ -64,15 +64,7 @@
                                                 </div>
                                             @endif
 
-                                            <div class="col-md-6">
-                                                <label class="text-capitalize">{{ translate('Base_URL_(optional)') }}</label>
-                                                <input type="text" class="form-control" name="providers[{{ $providerName }}][base_url]" placeholder="https://..." value="{{ $setting?->base_url }}">
-                                            </div>
-
-                                            <div class="col-md-3">
-                                                <label class="text-capitalize">{{ translate('Model_(optional)') }}</label>
-                                                <input type="text" class="form-control" name="providers[{{ $providerName }}][model]" placeholder="{{ translate('auto') }}" value="{{ $setting?->model }}">
-                                            </div>
+                                            @include('admin-views.business-settings.ai-configuration.model-select')
 
                                             <div class="col-md-3">
                                                 <label class="text-capitalize">{{ translate('Priority_(1=first)') }}</label>
@@ -345,5 +337,15 @@
             </div>
         </div>
     @endforeach
+
+    <script>
+        function updateDeepSeekBaseUrl(selectElement) {
+            const selectedUrl = selectElement.value;
+            const hiddenInput = selectElement.parentElement.querySelector('input[name*="base_url"]');
+            if (hiddenInput) {
+                hiddenInput.value = selectedUrl;
+            }
+        }
+    </script>
 @endpush
 

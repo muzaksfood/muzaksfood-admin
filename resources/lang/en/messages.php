@@ -3185,4 +3185,12 @@
   'Priority_(1=first)' => 'Priority (1=first)',
   'auto' => 'Auto',
   'Model_(optional)' => 'Model (optional)',
+  'Model' => 'Model',
+  'Base_URL_(optional)' => 'Base URL (optional)',
+  'select_model_optional' => 'Select Model (Optional)',
+  'select_base_url' => 'Select Base URL',
+  'no_models_available' => 'No models available',
+  'DeepSeek_Official' => 'DeepSeek Official',
+  'OpenRouter_AI' => 'OpenRouter AI',
+  'Free' => 'Free',
 );

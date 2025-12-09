@@ -8,7 +8,7 @@ use Modules\AI\app\Contracts\AIProviderInterface;
 class ClaudeProvider implements AIProviderInterface
 {
     protected string $apiKey = '';
-    protected string $model = 'claude-3-haiku-20240307';
+    protected string $model = 'claude-3-5-sonnet-20241022';
     protected string $baseUrl = 'https://api.anthropic.com/v1';
     protected array $settings = [];
 
