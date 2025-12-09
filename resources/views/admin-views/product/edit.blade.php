@@ -142,7 +142,7 @@
                                             (EN)</label>
 
                                         @if($aIStatus)
-                                            <button type="button" class="btn bg-white text-primary bg-transparent shadow-none border-0 opacity-1 generate_btn_wrapper p-0 auto_fill_description"   id=""  data-lang="" data-route="">
+                                            <button type="button" class="btn bg-white text-primary bg-transparent shadow-none border-0 opacity-1 generate_btn_wrapper p-0 auto_fill_description" id="title-en-action-btn" data-lang="en" data-route="{{ route('admin.product.title-auto-fill') }}">
                                                 <div class="btn-svg-wrapper">
                                                     <img width="18" height="18" class=""
                                                          src="{{ asset('public/assets/admin/img/ai/blink-right-small.svg') }}" alt="">
@@ -155,8 +155,8 @@
                                         @endif
                                     </div>
 
-                                    <div class="outline-wrapper title-container">
-                                        <input type="text" name="name[]" value="{{ $product['name'] }}"
+                                    <div class="outline-wrapper" id="title-container-en">
+                                        <input type="text" name="name[]" id="en_name" value="{{ $product['name'] }}"
                                         class="form-control" placeholder="{{ translate('New Product') }}">
                                     </div>
                                 </div>
