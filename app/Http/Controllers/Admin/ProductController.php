@@ -108,7 +108,7 @@ class ProductController extends Controller
     public function index(): View|Factory|Application
     {
         $categories = $this->category->where(['position' => 0])->pluck('name', 'id');
-        $aIStatus = AISetting::first()?->status;
+        $aIStatus = AISetting::where('status', 1)->exists();
 
         return view('admin-views.product.index', compact('categories', 'aIStatus'));
     }
@@ -391,7 +391,7 @@ class ProductController extends Controller
         $product = $this->product->withoutGlobalScopes()->with('translations')->find($id);
         $productCategory = json_decode($product->category_ids);
         $categories = $this->category->where(['parent_id' => 0])->get();
-        $aIStatus = AISetting::first()?->status;
+        $aIStatus = AISetting::where('status', 1)->exists();
         return view('admin-views.product.edit', compact('product', 'productCategory', 'categories', 'aIStatus'));
     }
 
