@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\CentralLogics\Helpers;
 use App\CentralLogics\ProductLogic;
+use App\CentralLogics\CategoryLogic;
 use App\Http\Controllers\Controller;
+use App\Model\Category;
 use App\Model\CategorySearchedByUser;
 use App\Model\FavoriteProduct;
 use App\Model\Product;
@@ -39,6 +41,40 @@ class ProductController extends Controller
         private Translation $translation,
         private VisitedProduct $visited_product
     ){}
+
+    /**
+     * Homepage feed: top categories with a limited set of products each.
+     */
+    public function getHomeProducts(Request $request): JsonResponse
+    {
+        $categoryLimit = (int) $request->get('category_limit', 12);
+        $productsPerCategory = (int) $request->get('products_per_category', 10);
+
+        $categories = Category::where(['position' => 0, 'status' => 1])
+            ->orderBy('priority', 'ASC')
+            ->limit($categoryLimit)
+            ->get();
+
+        $payload = $categories->map(function (Category $category) use ($productsPerCategory) {
+            $products = CategoryLogic::products($category->id)->take($productsPerCategory);
+
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'image' => $category->image ?? null,
+                'slug' => $category->slug ?? null,
+                'products' => Helpers::product_data_formatting($products, true),
+            ];
+        });
+
+        return response()->json([
+            'categories' => $payload,
+            'meta' => [
+                'category_limit' => $categoryLimit,
+                'products_per_category' => $productsPerCategory,
+            ],
+        ], 200);
+    }
 
     /**
      * @param Request $request

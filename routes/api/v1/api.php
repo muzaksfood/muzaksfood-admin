@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\OfflinePaymentMethodController;
+use App\Http\Controllers\Api\V1\CartQuickController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\TimeSlotController;
 
@@ -55,6 +56,7 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
     });
 
     Route::group(['prefix' => 'products'], function () {
+        Route::get('home', [ProductController::class, 'getHomeProducts']);
         Route::get('all', [ProductController::class, 'getAllProducts']);
         Route::get('latest', [ProductController::class, 'getLatestProducts']);
         Route::get('popular', [ProductController::class, 'getPopularProducts']);
@@ -82,6 +84,10 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
 
     Route::group(['prefix' => 'banners'], function () {
         Route::get('/', [BannerController::class, 'getBanners']);
+    });
+
+    Route::group(['prefix' => 'cart'], function () {
+        Route::post('quick-add', [CartQuickController::class, 'quickAdd']);
     });
 
     Route::group(['prefix' => 'notifications'], function () {

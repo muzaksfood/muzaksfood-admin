@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\PaymentController;
+use App\Model\Category;
+use App\CentralLogics\CategoryLogic;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SslCommerzPaymentController;
@@ -32,6 +34,23 @@ use function App\CentralLogics\translate;
 
 Route::get('/', function () {
     return redirect(\route('admin.dashboard'));
+});
+
+// Public landing page (Zepto-style browsing experience)
+Route::get('/landing', function () {
+    $categories = Category::where(['position' => 0, 'status' => 1])
+        ->orderBy('priority', 'ASC')
+        ->limit(12)
+        ->get();
+
+    // Attach limited products per category (10 each) for quick browsing
+    $categories->transform(function ($category) {
+        $products = CategoryLogic::products($category->id)->take(10);
+        $category->setRelation('home_products', $products);
+        return $category;
+    });
+
+    return view('landing', compact('categories'));
 });
 
 Route::get('/image-proxy', function () {
