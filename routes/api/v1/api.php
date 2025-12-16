@@ -24,6 +24,9 @@ use App\Http\Controllers\Api\V1\OfflinePaymentMethodController;
 use App\Http\Controllers\Api\V1\CartQuickController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\TimeSlotController;
+use App\Http\Controllers\Api\V1\PaymentMethodController;
+use App\Http\Controllers\Api\V1\FilterAnalyticsController;
+use App\Http\Controllers\Api\V1\SearchHistoryController;
 
 Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function () {
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
@@ -80,6 +83,9 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
         Route::get('trending', [ProductController::class, 'getTrendingProducts']);
         Route::get('recommended', [ProductController::class, 'getRecommendedProducts']);
         Route::get('most-reviewed', [ProductController::class, 'getMostReviewedProducts']);
+        
+        // Trending searches (public endpoint)
+        Route::get('trending-searches', [SearchHistoryController::class, 'getTrendingSearches']);
     });
 
     Route::group(['prefix' => 'banners'], function () {
@@ -151,6 +157,28 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
         Route::get('bonus/list', [CustomerWalletController::class, 'walletBonusList']);
 
         Route::get('loyalty-point-transactions', [LoyaltyPointController::class, 'pointTransactions']);
+
+        // Payment Methods endpoints
+        Route::group(['prefix' => 'payment-methods'], function () {
+            Route::get('/', [PaymentMethodController::class, 'index']);
+            Route::post('add', [PaymentMethodController::class, 'store']);
+            Route::put('update', [PaymentMethodController::class, 'update']);
+            Route::delete('delete/{id}', [PaymentMethodController::class, 'destroy']);
+            Route::post('set-default', [PaymentMethodController::class, 'setDefault']);
+        });
+
+        // Filter Analytics endpoints
+        Route::group(['prefix' => 'analytics'], function () {
+            Route::post('filter-usage', [FilterAnalyticsController::class, 'logFilterUsage']);
+            Route::get('popular-filters', [FilterAnalyticsController::class, 'getPopularFilters']);
+        });
+
+        // Search History endpoints
+        Route::group(['prefix' => 'search-history'], function () {
+            Route::get('/', [SearchHistoryController::class, 'getHistory']);
+            Route::post('save', [SearchHistoryController::class, 'saveSearch']);
+            Route::delete('clear', [SearchHistoryController::class, 'clearHistory']);
+        });
     });
 
     Route::group(['prefix' => 'coupon', 'middleware' => ['auth:api', 'customer_is_block']], function () {
